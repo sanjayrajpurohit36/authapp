@@ -1,23 +1,10 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const PORT = process.env.PORT || 3000;
-const mongoose = require("mongoose");
-const app = express();
-// connecting the DB
 dotenv.config({ path: "./config.env" });
+const PORT = process.env.PORT;
+const app = express();
 
-const DB = process.env.DB;
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-  })
-  .then(() => {
-    console.log("DB connected");
-  })
-  .catch((err) => console.log("Error in DB connection", err));
+require("./db/dbConfig");
 
 /**
  * Use of middleware is to check the data before going for the actual business logic
