@@ -27,8 +27,22 @@ router.get("/about", middleWare, (req, res) => {
   res.send({ message: "hello from about page" });
 });
 
-router.get("/login", (req, res) => {
-  res.send({ message: "hello from login page" });
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    let userExistQuery = await User.findOne({ email: email });
+    if (!email || !password) {
+      res.status(400).send({ message: "Missing fields" });
+    } else if (userExistQuery && userExistQuery.password == password) {
+      // password is hashed using the pre function in userSchema
+      return res.send({ message: "login successful" });
+    } else
+      return res
+        .status(400)
+        .send({ message: "User is not registered, Kindly register" });
+  } catch (err) {
+    return res.send({ message: "Error occured while login", error: err });
+  }
 });
 
 router.get("/register", (req, res) => {
