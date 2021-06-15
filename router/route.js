@@ -72,7 +72,7 @@ router.post("/register", async (req, res) => {
   let bodyData = req.body;
   const { name, email, phone, password, cpassword } = req.body; // destructuring the body elements
   if (!name || !email || !phone || !password || !cpassword) {
-    res.json({ error: "Kindly send all the fields" }); // error due to symentic entity
+    res.status(422).json({ error: "Kindly send all the fields" }); // error due to symentic entity
   } else {
     try {
       let userExistQueryResp = await User.findOne({ email: email });
