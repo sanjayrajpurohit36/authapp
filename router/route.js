@@ -4,6 +4,7 @@ const router = express.Router();
 require("./../db/dbConfig");
 const User = require("../models/userSchema");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 /**
  * Use of middleware is to check the data before going for the actual business logic
  * We use middlewares for authentication of the tokens provided by the users once
@@ -38,6 +39,14 @@ router.post("/signin", async (req, res) => {
       // if any document in the db exists the we need to match the password which user has entered
       let isMatch = await bcrypt.compare(password, userExistQuery.password);
       // compare is the function provided by bcrypt which will check the password which user has entered matches with the has which we have stored in our db or not.
+
+      let token = await userExistQuery.generateAuthToken();
+
+      // expects 2 params name of token key and token also we can add after how much time it should expire and all
+      res.cookie("jwtoken", token, {
+        expires: new Date(Date.now() + 25892000000), // will expire after 30 days also expires accepts value in ms
+        httpOnly: true, // must be written to that it works on localhost / http
+      });
 
       // password is hashed using the pre function in userSchema if the isMatch is true that means email and password are correct & the user is legitimate so allow the user to login
       return isMatch
@@ -103,8 +112,8 @@ router.post("/register", async (req, res) => {
         });
       } else {
         const user = new User({ name, email, phone, password, cpassword });
+        // password is hashed using pre function
         const userRegisterQueryResp = user.save();
-
         if (userRegisterQueryResp) {
           return res.json({ message: "User Registered Successfully" });
         } else {
